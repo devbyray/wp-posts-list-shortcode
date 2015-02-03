@@ -4,22 +4,54 @@
  * Description: [posts-list] gives a list of the most recent posts
  * Version: 0.1.0
  * Author: Raymon Schouwenaar
- * Author URI: https://raymonschouwenaar.nl
+ * Author URI: http://raymonschouwenaar.nl
  */
-function rss_posts_lists_shortcode()
-{
-    $recentPosts = new WP_Query();
-    $recentPosts->query( 'posts_per_page=5' );
-    $out = '<ul class="rss-wp-posts-list">\n';
-    while ( $recentPosts->have_posts() ) {
-        $recentPosts->the_post();
-        $out .= '<li>\n'.
-        	.'<a href="' . get_permalink() . '">\n'
-            . get_the_title() . '</a>\n'
-            .'</li>\n';
+function rss_posts_lists_shortcode($atts, $content = null) {
+	extract(
+		shortcode_atts(
+			array(
+			'total' => -1,
+			'category' => '',
+			),
+			$atts
+		)
+	);
+
+//	print_r($total);
+	if($total != '' && $total >= 0) {
+		$total = $total - 1;
+	}
+
+    $queryArgs = array(
+    	'posts_per_page'   => $total,
+    	'category_name' => $category
+    );
+
+    $queryPosts = new WP_Query( $queryArgs );
+//	print_r('<pre>');
+//	print_r($queryPosts);
+//	print_r('</pre>');
+
+    $output = '<ul class="rss-wp-posts-list">';
+
+    while ( $queryPosts->have_posts() ) {
+        $queryPosts->the_post();
+        $output .= '<li class="rss-wp-post-item">'
+        	. '<span class="rss-post-thumbnail">'
+        	. '<a href="'.get_permalink().'">'
+            . get_the_post_thumbnail( $queryPosts->ID, 'thumbnail')
+            . '</a>'
+            . '</span>'
+            . '<strong>'. get_the_title() . '</strong>'
+            . '<p>' . get_the_excerpt() . '</p>'
+        	. '<a href="'.get_permalink().'" class="button">'
+        	. 'Lees meer'
+            . '</a>'
+            .'</li>';
     }
-    $out .= '</ul>\n';
-    return $out;
+    $output .= '</ul>';
+
+    return $output;
 }
 add_shortcode('posts-list', 'rss_posts_lists_shortcode');
 ?>
