@@ -57,9 +57,6 @@ function rss_posts_lists_shortcode($atts, $content = null) {
     );
 
     $queryPosts = new WP_Query( $queryArgs );
-//	print_r('<pre>');
-//	print_r($queryPosts);
-//	print_r('</pre>');
 
     $output = '<ul class="rss-wp-posts-list">';
 
